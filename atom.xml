@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://ly-geming.github.io</id>
     <title>马克思列宁主义学习网</title>
-    <updated>2020-12-27T12:16:27.019Z</updated>
+    <updated>2020-12-27T12:19:41.127Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://ly-geming.github.io"/>
     <link rel="self" href="https://ly-geming.github.io/atom.xml"/>
@@ -10,6 +10,17 @@
     <logo>https://ly-geming.github.io/images/avatar.png</logo>
     <icon>https://ly-geming.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 马克思列宁主义学习网</rights>
+    <entry>
+        <title type="html"><![CDATA[宣言]]></title>
+        <id>https://ly-geming.github.io/post/xuan-yan/</id>
+        <link href="https://ly-geming.github.io/post/xuan-yan/">
+        </link>
+        <updated>2020-12-27T12:18:42.000Z</updated>
+        <content type="html"><![CDATA[<pre><code>风潮云涌的20世纪已经落幕。到了21世纪，资本的运作使得世界变得“和平而冷漠”，人们被娱乐媒体政策债务房产消费所迷惑，就像是在蚁后控制下的工蚁一般。娱乐至死，无数种类繁多的花样奶嘴堵塞住我们的嘴巴，眼前是无数块屏幕，耳畔边响起的是软弱的靡靡之声。太阳照常升起，而人们早已入土等待埋葬。经过了数百年，无产阶级专政正在逐步瓦解，资本家的利益正在扩大。资本家为了进一步压榨无产阶级的剩余价值，仅仅用轻飘飘的几句“福报”“兄弟”“奋斗”就把几代人用流血和生命奋战得来的8小时工作制改成‘996’工作制。世界的阶级分化，再次回到了百年前的样子----阶级分化严重，世界分为两大阵营：无产阶级和资产阶级。
+无产阶级正在被压迫，同志们起来啊！
+                                                 ----------一位坚定的共产主义者</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[六谈资本]]></title>
         <id>https://ly-geming.github.io/post/liu-tan-zi-ben/</id>
