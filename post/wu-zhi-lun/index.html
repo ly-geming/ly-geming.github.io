@@ -1,92 +1,101 @@
-
 <!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
+    <meta charset="utf-8" >
 
 <title>无知论 | 马克思列宁主义学习网</title>
-<meta name="description" content="全世界无产阶级联合起来！">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://ly-geming.github.io/favicon.ico?v=1609070843025">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="shortcut icon" href="https://ly-geming.github.io/favicon.ico?v=1609070884526">
 <link rel="stylesheet" href="https://ly-geming.github.io/styles/main.css">
 
 
 
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
 
 
+    <meta name="description" content="无知，有两层含义。一是对某种事物单纯的不知道，这是狭义上的无知；一是对事物的愚昧，不想去了解，只愿意相信自己的言论，这是广义上的无知。这两种情况，尤其是最后一种，对于我们而言是值得警惕的。
+第一种无知，代表着对事物的不了解。比如你不了解生物..." />
+    <meta name="keywords" content="" />
   </head>
   <body>
     <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://ly-geming.github.io">
-        <img class="avatar" src="https://ly-geming.github.io/images/avatar.png?v=1609070843025" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://ly-geming.github.io">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://ly-geming.github.io">
+        <img src="https://ly-geming.github.io/images/avatar.png?v=1609070884526" class="site-logo">
         <h1 class="site-title">马克思列宁主义学习网</h1>
       </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
     </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
-  </div>
-</div>
-
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
+    <div>
       
         
-          <a href="/" class="menu purple-link">
+          <a href="/" class="site-nav">
             首页
           </a>
         
       
         
-          <a href="/archives" class="menu purple-link">
+          <a href="/archives" class="site-nav">
             归档
           </a>
         
       
         
-          <a href="/tags" class="menu purple-link">
+          <a href="/tags" class="site-nav">
             标签
           </a>
         
       
         
-          <a href="/post/about" class="menu purple-link">
+          <a href="/post/about" class="site-nav">
             关于
           </a>
         
       
     </div>
   </div>
-</transition>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      全世界无产阶级联合起来！
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://ly-geming.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
 
 
-      <div class="content-container">
-        <div class="post-detail">
-          
-          <h2 class="post-title">无知论</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2020-12-27</span>
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">无知论</h2>
+            <div class="post-date">2020-12-27</div>
             
-          </div>
-          <div class="post-content">
-            <p>无知，有两层含义。一是对某种事物单纯的不知道，这是狭义上的无知；一是对事物的愚昧，不想去了解，只愿意相信自己的言论，这是广义上的无知。这两种情况，尤其是最后一种，对于我们而言是值得警惕的。<br>
+            <div class="post-content" v-pre>
+              <p>无知，有两层含义。一是对某种事物单纯的不知道，这是狭义上的无知；一是对事物的愚昧，不想去了解，只愿意相信自己的言论，这是广义上的无知。这两种情况，尤其是最后一种，对于我们而言是值得警惕的。<br>
 第一种无知，代表着对事物的不了解。比如你不了解生物进化史，是对生物进化的无知；你对微观分子不了解，是对量子力学的无知。这种情况所有人都会存在，表现在对某一门知识上，某一件事情上。这种情况我们不用过于警惕，只需要防止他对于自己无知的方面进行无知的意见，也就是防止对没有调查的人的发言权。这种无知比较容易解决，一般人只需要仔细了解即可。这种人不在我们的讨论之内。<br>
 第二种无知，代表的对事物的愚昧，意思是不想了解真相，只是保守着自己形而上学，主观感受的无知。这种人没有正确的调查，却喜欢发表自己的观点。还有一种人，对于不关于自己的“生存”的事物一概不去了解，最后却稀里糊涂的被人蛊惑。举个例子，宗教就是一个典型的例子，当人类有能力去追求精神层面时，人们就会思考：我是谁，我从哪里来，要到哪里去？限于当时知识有限，人们得出了“人类是由神发明，神保佑的生物，死后会去往地狱或者天堂”这样的结论，这样的多神论最后被单神论取代。这就是人类主观感受，形而上学的观点。<br>
 第二种无知尤为可怕，他的可怕之处就在于只相信自己的主观感受或第一次听到的消息，而不愿意去相信那些滴水不漏的观点。在2000年前的希腊雅典，无知的人们正是因为被政客煽动，对远征元帅处以死刑，为后来伯罗奔尼撒战争的失败埋下了伏笔（这也是反对西方民主的最好的例子了）。由于自身或外界的限制，他们没有去实践——也就是去调查真相。普通民众或军队一旦被蛊惑，这个国家必定会灭亡，在2000年的伊拉克，人们正是相信美国提出的“自由，民主”导致国家加速灭亡，成为美国的傀儡。在上世纪的智利，由于军队相信美国的“自由，民主”导致一个新生的社会主义国家走向灭亡，这，就是第二种无知的第一种情况：被他人（尤其是反动派）蛊惑而造成的无知（本质就是自己没有去了解真相）产生的严重后果。<br>
@@ -103,45 +112,31 @@
 我们需要武装自己，也就是理想和现实（折中思维）兼备（保持自己的独立思考，这个同样也需要培养），我们没实力去说服对方，我们要做的，只是去保持现状，不要相信对方罢了，他们这种人会随着时间的长河散去，我们只需要等待国家强大到和发达国家拥有一样的生活条件，拥有更好的意识形态，更好的政府，而我们需要好好学习，天天（打断施法）……<br>
 所有的所有，无知的根本，毛主席在《反对本本主义》中就已经阐明了，这些人绝大多数本身就是本本主义者，为什么这么说？举一个极端的例子，如果一个人是怀疑主义者的话（指什么都不信，怀疑一切除了自己的胡言乱语之外的命题的真实性的人，但是，怀疑主义者也是无知的，因为他们也没有去调查，只不过这是特殊的无知者）（有一种怀疑主义比较特殊，他们或许有学识 或许知道真相，但是他们偏偏传播了阴谋论，以满足他们的心理，这也是无知的表现。怀疑主义也就是阴谋论，是政治的一个特殊门派，他们和虚无主义为盟友，都是我们要打压的对象），那么，他们也就不会相信那些东西，也就避免了这种无知（见上一个括号）本本主义者，由于相信“本本”（也就是书本内容，泛指一些“专家”说的话），他们也就会走上错误的道路，形成错误的理论，走向无知。如何避免这些无知？你需要调查。相信大家都已经明白了，如果你想获得真相，一定要尽自己所有手段去调查，最后一定一定保持独立思考，得出最公正的结论（但是，对于我们无完全民事能力人来说，调查是困难的。所以，我们千万不要对一件事情妄加评论）。</p>
 
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://ly-geming.github.io/post/zheng-li-cai-liao-di-yi-ban/">
+                  <h3 class="post-title">
+                    整理材料第一版
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
           </div>
+
         </div>
-
-        
-          <div class="next-post">
-            <a class="purple-link" href="https://ly-geming.github.io/post/zheng-li-cai-liao-di-yi-ban/">
-              <h3 class="post-title">
-                下一篇：整理材料第一版
-              </h3>
-            </a>
-          </div>
-          
       </div>
-
-      
-
-      <div class="site-footer">
-  <div class="slogan">全世界无产阶级联合起来！</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://ly-geming.github.io/atom.xml" target="_blank">RSS</a>
-</div>
-
-
     </div>
-    <script type="application/javascript">
 
-hljs.initHighlightingOnLoad()
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
 
 var app = new Vue({
   el: '#app',
@@ -151,6 +146,8 @@ var app = new Vue({
 })
 
 </script>
+
+
 
 
 
