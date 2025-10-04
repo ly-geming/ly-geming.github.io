@@ -284,6 +284,50 @@ if (true) {
   margin-right: 5px;
 }
 
+/* 删除按钮样式 */
+.delete-event-btn {
+  margin-left: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0 5px;
+  font-size: 12px;
+}
+
+.delete-event-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 右键菜单样式 */
+.event-context-menu {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 5px 0;
+  display: none;
+}
+
+.event-context-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.event-context-menu button:hover {
+  background: #f5f5f5;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   #calendar-container {
@@ -334,11 +378,32 @@ if (true) {
     localStorage.setItem(storageKey, JSON.stringify(events));
   }
   
+  // 删除事件
+  function deleteEvent(eventId) {
+    events = events.filter(function(event) { return event.id !== eventId; });
+    saveEvents();
+    calendar.refetchEvents();
+  }
+  
   // 加载事件
   loadEvents();
   
   // 是否隐藏已完成事件
   var hideCompleted = false;
+  
+  // 创建右键菜单
+  var contextMenu = document.createElement('div');
+  contextMenu.className = 'event-context-menu';
+  contextMenu.innerHTML = '<button id="delete-event-btn">删除事件</button>';
+  document.body.appendChild(contextMenu);
+  
+  // 隐藏右键菜单
+  function hideContextMenu() {
+    contextMenu.style.display = 'none';
+  }
+  
+  // 点击其他地方隐藏菜单
+  document.addEventListener('click', hideContextMenu);
   
   var calendarEl = document.getElementById('calendar');
   var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -376,7 +441,7 @@ if (true) {
       }
     },
     eventContent: function(arg) {
-      // 自定义事件内容，添加复选框
+      // 自定义事件内容，添加复选框和删除按钮
       var event = events.find(function(e) { return e.id === arg.event.id; });
       if (event) {
         var checkbox = document.createElement('input');
@@ -397,8 +462,39 @@ if (true) {
           title.style.opacity = '0.7';
         }
         
-        return { domNodes: [checkbox, title] };
+        // 添加删除按钮
+        var deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-event-btn';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (confirm('确定要删除这个事件吗？')) {
+            deleteEvent(arg.event.id);
+          }
+        });
+        
+        return { domNodes: [checkbox, title, deleteBtn] };
       }
+    },
+    // 添加事件右键菜单
+    eventDidMount: function(info) {
+      info.el.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        var eventId = info.event.id;
+        
+        // 设置删除按钮事件
+        document.getElementById('delete-event-btn').onclick = function() {
+          if (confirm('确定要删除这个事件吗？')) {
+            deleteEvent(eventId);
+            hideContextMenu();
+          }
+        };
+        
+        // 显示菜单
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+      });
     },
     // 添加事件拖动结束后的处理
     eventDrop: function(info) {
