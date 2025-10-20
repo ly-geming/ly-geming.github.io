@@ -60,7 +60,7 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2025-10-20 22:14:26',
+  postUpdate: '2025-10-20 22:16:11',
   postMainColor: '',
 }</script><noscript><style type="text/css">
   #nav {
@@ -573,6 +573,52 @@ document.addEventListener('pjax:error', e => {
   }
 })</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div><!-- hexo injector body_end start -->
 <script>
+(function () {
+  // 防止重复初始化
+  if (window.MathJax) return;
+
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    startup: {
+      typeset: true,
+      ready: () => {
+        // 确保默认行为（包括处理 <script type="math/tex">）
+        MathJax.startup.defaultReady();
+        
+        // Pjax / 无刷新跳转支持（AnZhiYu 默认启用 Pjax）
+        const handleTypeset = () => {
+          if (typeof MathJax !== 'undefined') {
+            MathJax.typesetClear();
+            MathJax.typeset();
+          }
+        };
+        
+        // 监听 Pjax 完成事件
+        document.addEventListener('pjax:complete', handleTypeset);
+        // 兜底：页面加载完成也触发一次（应对直接访问）
+        window.addEventListener('load', handleTypeset);
+      }
+    }
+  };
+
+  // 加载支持 <script type="math/tex"> 的完整 MathJax 包
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js';
+  script.id = 'MathJax-script';
+  script.async = true;
+  document.head.appendChild(script);
+})();
+</script>
+
+<script>
 MathJax = {
   tex: {
     inlineMath: [['$', '$'], ['\(', '\)']],
@@ -587,21 +633,7 @@ MathJax = {
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
-
-<script>
-(function () {
-  // 防止重复初始化
-  if (window.MathJax) return;
-
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']],
-      processEscapes: true,
-      processEnvironments: true
-    },
-    options: {
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+<!-- hexo injector body_end end --></body></html> ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
     },
     startup: {
       typeset: true,
@@ -633,51 +665,20 @@ MathJax = {
   document.head.appendChild(script);
 })();
 </script>
-<!-- hexo injector body_end end --></body></html>n.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
 
 <script>
-(function () {
-  // 防止重复初始化
-  if (window.MathJax) return;
-
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']],
-      processEscapes: true,
-      processEnvironments: true
-    },
-    options: {
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    startup: {
-      typeset: true,
-      ready: () => {
-        // 确保默认行为（包括处理 <script type="math/tex">）
-        MathJax.startup.defaultReady();
-        
-        // Pjax / 无刷新跳转支持（AnZhiYu 默认启用 Pjax）
-        const handleTypeset = () => {
-          if (typeof MathJax !== 'undefined') {
-            MathJax.typesetClear();
-            MathJax.typeset();
-          }
-        };
-        
-        // 监听 Pjax 完成事件
-        document.addEventListener('pjax:complete', handleTypeset);
-        // 兜底：页面加载完成也触发一次（应对直接访问）
-        window.addEventListener('load', handleTypeset);
-      }
-    }
-  };
-
-  // 加载支持 <script type="math/tex"> 的完整 MathJax 包
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js';
-  script.id = 'MathJax-script';
-  script.async = true;
-  document.head.appendChild(script);
-})();
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\(', '\)']],
+    displayMath: [['$$', '$$'], ['\[', '\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
 <!-- hexo injector body_end end --></body></html>
