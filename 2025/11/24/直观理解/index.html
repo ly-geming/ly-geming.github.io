@@ -1,0 +1,693 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon AlphaZero: 神经网络架构深度解析</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-purple: #a855f7;
+            --accent-pink: #f472b6;
+            --accent-orange: #f59e0b;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 { margin: 0; color: var(--accent-blue); }
+        h2 { font-size: 1.2rem; color: #94a3b8; font-weight: normal; }
+        h3 { margin-top: 0; }
+
+        /* 步骤导航条 - 6步 */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #94a3b8;
+            user-select: none;
+        }
+        .step-dot.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #0f172a;
+            transform: scale(1.1);
+        }
+        .step-dot:hover {
+             background: var(--border-color);
+        }
+
+        /* 内容卡片 */
+        .stage-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: none; /* 默认隐藏，JS控制显示 */
+            animation: fadeIn 0.5s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+        .stage-card.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-snippet {
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            color: #e2e8f0;
+            margin-top: 15px;
+            border-left: 3px solid var(--accent-blue);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: var(--accent-purple); }
+
+        .visual-box {
+            background: rgba(0,0,0,0.2);
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 150px;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* 棋盘样式 */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 30px);
+            gap: 2px;
+            background: #333;
+            padding: 2px;
+            border: 2px solid #555;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .cell.white { background: #eee; color: #000; }
+        .cell.black { background: #222; color: #fff; }
+        .cell.arrow { background: var(--accent-orange); color: #000; }
+
+        /* 张量/特征图样式 */
+        .tensor-stack {
+            display: flex;
+            gap: 10px;
+            perspective: 500px;
+        }
+        .feature-map {
+            width: 60px;
+            height: 60px;
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--accent-blue);
+            position: relative;
+            transform: rotateX(20deg) rotateY(-10deg);
+            transition: transform 0.3s;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        .feature-map:hover { transform: rotateX(0deg) rotateY(0deg) scale(1.1); z-index: 10; }
+        .feature-label {
+            position: absolute;
+            bottom: -25px;
+            width: 140%;
+            left: -20%;
+            text-align: center;
+            font-size: 10px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        /* 神经网络块 */
+        .nn-flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nn-block {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 140px;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .flow-arrow { font-size: 1.5rem; color: #555; }
+
+        /* =========================================
+           Stage 4: 交互式 Attention Visual 样式
+        ========================================= */
+        .attention-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: 20px 0;
+        }
+
+        .attention-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--accent-pink);
+            background: rgba(244, 114, 182, 0.05);
+            position: relative;
+            z-index: 2; /* 确保网格在连线之上 */
+        }
+
+        .att-cell {
+            border: 1px solid rgba(244, 114, 182, 0.2);
+            cursor: crosshair;
+            transition: all 0.2s;
+        }
+
+        /* 鼠标悬停的源点 (Query) */
+        .att-cell:hover {
+            background: var(--accent-pink);
+            box-shadow: 0 0 15px var(--accent-pink);
+            z-index: 3;
+        }
+
+        /* 被关注的目标点 (Key/Value) */
+        .att-target {
+            background: rgba(244, 114, 182, 0.6) !important;
+            box-shadow: 0 0 10px var(--accent-pink);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        /* 连线层 */
+        .attention-lines-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 不阻挡鼠标事件 */
+            z-index: 1;
+        }
+
+        /* 动态连线 */
+        .att-line {
+            position: absolute;
+            background: var(--accent-pink);
+            height: 2px;
+            transform-origin: 0 50%; /* 从左侧中心旋转 */
+            opacity: 0.7;
+            box-shadow: 0 0 8px var(--accent-pink);
+            transition: all 0.3s ease-out;
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            float: right;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+        .btn:hover { background: #0ea5e9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
+
+        .info-tag {
+            display: inline-block;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .highlight { color: var(--accent-green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Amazon AlphaZero: 神经网络架构深度解析</h1>
+        <h2>从棋盘特征到全局策略的完整信息流转</h2>
+    </header>
+
+    <div class="progress-bar">
+        <div class="step-dot active" onclick="showStage(0)">1</div>
+        <div class="step-dot" onclick="showStage(1)">2</div>
+        <div class="step-dot" onclick="showStage(2)">3</div>
+        <div class="step-dot" onclick="showStage(3)" style="border-color: var(--accent-pink); color: var(--accent-pink);">4</div> <div class="step-dot" onclick="showStage(4)">5</div>
+        <div class="step-dot" onclick="showStage(5)">6</div>
+    </div>
+
+    <div class="stage-card active" id="stage-0" style="border-top: 3px solid var(--accent-blue);">
+        <h3 style="color: var(--accent-blue);">Stage 1: 原始棋盘与标准化 (Canonical Form)</h3>
+        <p>一切始于游戏引擎。在 MCTS 搜索中，棋盘是一个基础的 8x8 整数矩阵。为了让神经网络更容易学习，我们必须将所有玩家的视角统一。</p>
+
+        <div class="visual-box">
+            <div style="margin-bottom: 10px; font-weight: bold;">Canonical Board (8x8 int32)</div>
+            <div id="raw-board" class="board-grid"></div>
+            <div style="margin-top: 10px; font-size: 0.8em; color: #888;">
+                数值编码: 1=己方(白), -1=敌方(黑), 2=障碍/箭
+            </div>
+        </div>
+
+        <div class="code-snippet"><span class="code-comment"># From: AmazonsGame.py</span>
+<span class="code-keyword">def</span> getCanonicalForm(self, board, player):
+    <span class="code-comment"># 如果是玩家1（初始在下方），旋转180度变为上方视角</span>
+    <span class="code-keyword">if</span> player == 1:
+        <span class="code-keyword">return</span> np.rot90(board, 2)
+    <span class="code-comment"># 玩家-1已经在上方，无需旋转</span>
+    <span class="code-keyword">return</span> board
+<span class="code-comment"># 始终保证当前行动方在神经网络看来是从上往下进攻</span></div>
+        <p><strong>N-to-1 架构基石:</strong> 这些标准化的棋盘数据不会直接送入 GPU，而是通过高效的 IPC 机制汇聚到 <code>Dispatcher</code>，这是实现高吞吐量的第一步。</p>
+        <button class="btn" onclick="nextStage()">Next: 特征工程 >></button>
+    </div>
+
+    <div class="stage-card" id="stage-1" style="border-top: 3px solid var(--accent-green);">
+        <h3 style="color: var(--accent-green);">Stage 2: 7通道特征提取 (Feature Extraction)</h3>
+        <p>在 <code>GpuWorker</code> 中，原始的整数矩阵被“翻译”成神经网络能理解的语言。我们提取了 7 个关键特征平面，显式地告诉网络棋盘上的局势。</p>
+
+        <div class="visual-box">
+            <div style="margin-bottom: 15px; font-weight: bold;">Input Tensor: [Batch, 7, 8, 8]</div>
+            <div class="tensor-stack">
+                <div class="feature-map"><div class="feature-label">Ch1: My Pieces</div></div>
+                <div class="feature-map"><div class="feature-label">Ch2: Op Pieces</div></div>
+                <div class="feature-map" style="background: rgba(245, 158, 11, 0.2); border-color: var(--accent-orange);"><div class="feature-label">Ch3: Obstacles</div></div>
+                <div class="feature-map" style="background: rgba(74, 222, 128, 0.2); border-color: var(--accent-green);"><div class="feature-label">Ch4: My Mobility</div></div>
+                <div class="feature-map" style="background: rgba(74, 222, 128, 0.2); border-color: var(--accent-green);"><div class="feature-label">Ch5: Op Mobility</div></div>
+                <div class="feature-map" style="background: rgba(168, 85, 247, 0.2); border-color: var(--accent-purple);"><div class="feature-label">Ch6: My Potential</div></div>
+                <div class="feature-map" style="background: rgba(168, 85, 247, 0.2); border-color: var(--accent-purple);"><div class="feature-label">Ch7: Op Potential</div></div>
+            </div>
+        </div>
+
+        <div class="code-snippet"><span class="code-comment"># From: GpuWorker.py & teacher_bridge.cpp</span>
+<span class="code-comment"># 利用 C++ 高速计算复杂的机动性特征</span>
+board_7ch = np.zeros((B, 7, 8, 8), dtype=np.float32)
+board_7ch[i] = teacher_bridge.compute_7ch_features(my, op, arr)
+
+<span class="code-comment"># 这些特征图包含了位置信息、机动性热力图和潜在控制区域</span></div>
+        <p>这个步骤将复杂的规则逻辑转化为几何特征，极大地降低了神经网络的学习难度。</p>
+        <button class="btn" onclick="nextStage()">Next: 深层骨干网络 >></button>
+    </div>
+
+    <div class="stage-card" id="stage-2" style="border-top: 3px solid var(--accent-purple);">
+        <h3 style="color: var(--accent-purple);">Stage 3: 深层 ResNet-40 骨干网络</h3>
+        <p>数据进入 <code>AmazonsPytorch.py</code>。7通道的输入首先被投影到高维空间，然后通过一个深达 40 层的残差网络 (ResNet)。这是 AI 的“躯干”，负责理解复杂的棋形和局势。</p>
+
+        <div class="visual-box" style="flex-direction: row; justify-content: center; gap: 20px;">
+            <div class="nn-block">
+                <strong>Input Conv</strong><br>
+                <span class="info-tag">7 → 256 Channels</span>
+                <div style="font-size: 0.8em; margin-top: 5px;">升维投影</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="nn-block" style="border-color: var(--accent-purple); background: linear-gradient(135deg, #1e293b, #4c1d95);">
+                <strong>ResBlock x 20</strong><br>
+                <span class="info-tag" style="color: #e9d5ff;">ResNet-40 Backbone</span><br>
+                <div style="font-size: 0.8em; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px;">
+                    Conv3x3 → BN → ReLU<br>
+                    Conv3x3 → BN → + → ReLU
+                </div>
+            </div>
+        </div>
+
+        <div class="code-snippet"><span class="code-comment"># From: AmazonsPytorch.py</span>
+<span class="code-keyword">class</span> AmazonsNNet(nn.Module):
+    <span class="code-keyword">def</span> __init__(self, game, args):
+        <span class="code-comment"># ... 初始化 ...</span>
+        self.conv1 = nn.Conv2d(7, 256, kernel_size=3, ...)
+        <span class="code-comment"># 堆叠 20 个残差块，深度提取特征</span>
+        self.res_layers = nn.ModuleList([ResBlock(256) <span class="code-keyword">for</span> _ <span class="code-keyword">in</span> range(20)])
+
+    <span class="code-keyword">def</span> forward(self, s):
+        s = F.relu(self.bn1(self.conv1(s)))
+        <span class="code-keyword">for</span> layer <span class="code-keyword">in</span> self.res_layers:
+            s = layer(s)
+        <span class="code-comment"># 此时 s 的形状为 [Batch, 256, 8, 8]，是高度抽象的局部特征集合</span>
+        <span class="code-keyword">return</span> s</div>
+        <p>经过这一阶段，网络已经提取了丰富的局部特征，但它对棋盘的理解仍然局限于卷积核覆盖的区域。</p>
+        <button class="btn" onclick="nextStage()" style="background-color: var(--accent-pink);">Next: 关键技术 - 全局注意力 >></button>
+    </div>
+
+    <div class="stage-card" id="stage-3" style="border-top: 3px solid var(--accent-pink); background: linear-gradient(to bottom, var(--card-bg), rgba(244, 114, 182, 0.05));">
+        <h3 style="color: var(--accent-pink); display: flex; align-items: center;">
+            <span style="margin-right: 10px;">⚡</span> Stage 4: 全局自注意力机制 (Global Self-Attention)
+        </h3>
+        <p><strong>这是网络中最关键的组件之一。</strong> 传统的卷积网络 (CNN) 受限于局部感受野，难以捕捉远距离的依赖关系。而 Self-Attention 允许网络在一步之内建立棋盘上任意两个位置之间的联系。</p>
+
+        <div class="visual-box" style="background: rgba(0,0,0,0.3);">
+            <div style="margin-bottom: 10px; font-weight: bold; color: var(--accent-pink);">交互演示：捕捉远距离依赖 (Hover to Interact)</div>
+            <p style="font-size: 0.9em; color: #aaa; margin-bottom: 15px;">
+                将鼠标悬停在网格上，体验一个位置 (<strong style="color:var(--accent-pink)">Query</strong>) 如何“瞬间”关注并聚合棋盘上其他关键位置 (<span style="color:rgba(244, 114, 182, 0.8); font-weight:bold;">Key/Value</span>) 的信息。
+            </p>
+
+            <div class="attention-container" id="att-interactive-container">
+                <div class="attention-lines-layer" id="att-lines-layer"></div>
+                <div class="attention-grid" id="att-grid">
+                    </div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 0.8em; color: var(--accent-pink); text-align: center;">
+                示意图：鼠标所在位置的特征直接关注并聚合了棋盘其他区域的信息，打破了卷积的局部限制。
+            </div>
+        </div>
+
+        <div class="code-snippet" style="border-left-color: var(--accent-pink);"><span class="code-comment"># From: AmazonsPytorch.py - SelfAttentionBlock</span>
+<span class="code-keyword">class</span> SelfAttentionBlock(nn.Module):
+    <span class="code-keyword">def</span> forward(self, x):
+        <span class="code-comment"># 1. 将特征图转换为 Query, Key, Value</span>
+        proj_query = self.query(x).view(B, -1, N).permute(0, 2, 1) <span class="code-comment"># B x N x C'</span>
+        proj_key   = self.key(x).view(B, -1, N)                    <span class="code-comment"># B x C' x N</span>
+
+        <span class="code-comment"># 2. 计算能量矩阵 (Energy Matrix)：任意两点间的相关性</span>
+        energy = torch.bmm(proj_query, proj_key) <span class="code-comment"># B x N x N</span>
+        attention = F.softmax(energy, dim=-1)    <span class="code-comment"># 归一化为注意力权重</span>
+
+        <span class="code-comment"># 3. 全局信息聚合：根据权重加权求和 Value</span>
+        proj_value = self.value(x).view(B, -1, N)
+        out = torch.bmm(proj_value, attention.permute(0, 2, 1))
+
+        <span class="code-comment"># 4. 残差连接：将全局上下文注入原始局部特征</span>
+        <span class="code-keyword">return</span> self.gamma * out + x</div>
+        <p>通过这一步，特征图中的每一个点都包含了全局的上下文信息，为接下来的复杂决策奠定了基础。</p>
+        <button class="btn" onclick="nextStage()">Next: 动态策略头 >></button>
+    </div>
+
+    <div class="stage-card" id="stage-4" style="border-top: 3px solid var(--accent-orange);">
+        <h3 style="color: var(--accent-orange);">Stage 5: 动态特征更新头 (Dynamic Feature Update Head)</h3>
+        <p>这是针对亚马逊棋规则设计的特殊结构。由于一步棋包含“移动”和“射箭”两个动作，我们采用了一种<strong>因果推理</strong>机制：网络在特征层面“想象”棋子移动后的样子，再据此决定射箭位置。</p>
+
+        <div class="visual-box">
+            <div class="nn-flow-container">
+                <div class="nn-block" style="border-color: var(--accent-orange);">
+                    <strong style="color: var(--accent-orange);">A. Move Decision</strong><br>
+                    <span class="info-tag">Query: Source</span><br>
+                    <span class="info-tag">Key: Destination</span>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <div class="nn-block" style="border: 2px dashed var(--accent-orange); background: rgba(245, 158, 11, 0.1);">
+                    <strong style="color: var(--accent-orange);">B. Latent Simulation</strong><br>
+                    <span class="info-tag">Update Gate</span><br>
+                    <div style="font-size: 0.8em; color: #ccc; margin-top: 5px;">将目的地(Dst)信息<br>注入全局特征</div>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <div class="nn-block" style="border-color: var(--accent-orange);">
+                    <strong style="color: var(--accent-orange);">C. Arrow Decision</strong><br>
+                    <span class="info-tag">Query: Shooter (New Pos)</span><br>
+                    <span class="info-tag">Key: Target</span>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 20px; font-weight: bold;">
+                <div style="color: var(--accent-orange);">输出 1: P(Src, Dst)</div>
+                <div style="color: var(--accent-orange);">输出 2: P(Arr | Dst)</div>
+            </div>
+        </div>
+
+        <div class="code-snippet"><span class="code-comment"># From: AmazonsPytorch.py - DynamicFeatureUpdateHead</span>
+<span class="code-comment"># 1. 计算移动概率 Logits (基于原始特征 x)</span>
+move_logits = torch.bmm(src_q, dst_k) ...
+
+<span class="code-comment"># 2. [关键] 模拟移动：将潜在目的地特征(dst_k)拼接到全局特征</span>
+combined = torch.cat([x, dst_k_map], dim=1)
+<span class="code-comment"># 通过 Update Gate 生成“移动后”的特征 x_next</span>
+x_next = self.update_gate(combined) + x 
+
+<span class="code-comment"># 3. 基于“移动后”的特征 x_next 预测射箭</span>
+arr_q = self.conv_arrow_query(x_next)...
+arrow_logits = torch.bmm(arr_q, arr_k) ...</div>
+        <p>这种设计确保了射箭的决策是基于移动之后的最新局势做出的，符合游戏规则的因果逻辑。</p>
+        <button class="btn" onclick="nextStage()">Next: 最终输出 >></button>
+    </div>
+
+    <div class="stage-card" id="stage-5" style="border-top: 3px solid #ef4444;">
+        <h3 style="color: #ef4444;">Stage 6: 最终输出与 MCTS 集成</h3>
+        <p>网络最终输出三个核心张量，它们被回传给 <code>Dispatcher</code>，最终由 <code>MCTS</code> 用于指导搜索和决策。</p>
+
+        <div class="visual-box" style="align-items: stretch;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+                <li style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-left: 5px solid var(--accent-orange); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>1. Policy Move (Logits)</strong><br>
+                        <span style="font-size:0.9em; color:#888;">P(Source, Destination) 的联合概率分布</span>
+                    </div>
+                    <div class="info-tag" style="font-family: monospace;">Shape: [Batch, 4096]</div>
+                </li>
+                <li style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-left: 5px solid var(--accent-orange); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>2. Policy Arrow (Logits)</strong><br>
+                        <span style="font-size:0.9em; color:#888;">给定目的地 Dst 后的条件射箭概率 P(Arrow | Dst)</span>
+                    </div>
+                    <div class="info-tag" style="font-family: monospace;">Shape: [Batch, 64, 64]</div>
+                </li>
+                <li style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-left: 5px solid #ef4444; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>3. Value (v)</strong><br>
+                        <span style="font-size:0.9em; color:#888;">对当前局面胜率的标量估计 (-1 到 1)</span>
+                    </div>
+                    <div class="info-tag" style="font-family: monospace;">Shape: [Batch, 1]</div>
+                </li>
+            </ul>
+        </div>
+
+        <p>在 MCTS 搜索中，这两个概率矩阵被结合起来计算一个完整动作的先验概率：</p>
+        <div class="code-snippet"><span class="code-comment"># From: OrchestratedMCTS.py</span>
+<span class="code-comment"># 组合联合概率与条件概率</span>
+<span class="code-comment"># P(Move, Arrow) = P(Move) * P(Arrow | Move.Dst)</span>
+prob = prob_move_part * prob_arrow_part</div>
+        <div style="margin-top: 30px; text-align: center;">
+            <button class="btn" onclick="showStage(0)" style="background: var(--border-color); float: none;">重新开始演示</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // =========================================
+    // Stage 1: 初始化虚拟棋盘
+    // =========================================
+    const boardEl = document.getElementById('raw-board');
+    const boardState = [
+        [0,0,0,-1,0,-1,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,2,0,0,0,0,0],
+        [1,0,0,0,0,0,0,-1],
+        [-1,0,0,0,0,0,0,1],
+        [0,0,0,0,0,2,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,1,0,1,0,0,0]
+    ];
+
+    boardState.forEach((row, r) => {
+        row.forEach((cellVal, c) => {
+            const div = document.createElement('div');
+            div.className = 'cell';
+            if ((r + c) % 2 === 0) {
+                div.style.backgroundColor = '#444';
+            }
+            if (cellVal === 1) {
+                div.classList.add('white');
+                div.textContent = 'W';
+            } else if (cellVal === -1) {
+                div.classList.add('black');
+                div.textContent = 'B';
+            } else if (cellVal === 2) {
+                div.classList.add('arrow');
+                div.textContent = 'X';
+            }
+            boardEl.appendChild(div);
+        });
+    });
+
+    // =========================================
+    // Stage 4: 初始化交互式 Attention Visual
+    // =========================================
+    const attGrid = document.getElementById('att-grid');
+    const attLinesLayer = document.getElementById('att-lines-layer');
+    let activeSourceCell = null;
+
+    // 生成 8x8 网格
+    for (let i = 0; i < 64; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'att-cell';
+        cell.dataset.index = i;
+
+        // 鼠标悬停事件
+        cell.addEventListener('mouseenter', (e) => handleCellHover(e.target, i));
+
+        attGrid.appendChild(cell);
+    }
+
+    // 鼠标离开整个网格区域时清除状态
+    attGrid.addEventListener('mouseleave', clearAttentionState);
+
+    function handleCellHover(sourceCell, index) {
+        if (activeSourceCell === sourceCell) return;
+        clearAttentionState();
+        activeSourceCell = sourceCell;
+
+        // 1. 获取源点坐标
+        const sourceRect = sourceCell.getBoundingClientRect();
+        const containerRect = attGrid.getBoundingClientRect();
+        const sourceCenterX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+        const sourceCenterY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+
+        // 2. 随机选择 3-5 个目标格子
+        const numTargets = Math.floor(Math.random() * 3) + 3;
+        const targetIndices = new Set();
+        while(targetIndices.size < numTargets) {
+            let idx = Math.floor(Math.random() * 64);
+            if (idx !== index) targetIndices.add(idx);
+        }
+
+        // 3. 绘制连线并高亮目标
+        targetIndices.forEach(targetIndex => {
+            const targetCell = attGrid.children[targetIndex];
+            targetCell.classList.add('att-target');
+
+            const targetRect = targetCell.getBoundingClientRect();
+            const targetCenterX = targetRect.left + targetRect.width / 2 - containerRect.left;
+            const targetCenterY = targetRect.top + targetRect.height / 2 - containerRect.top;
+
+            createLine(sourceCenterX, sourceCenterY, targetCenterX, targetCenterY);
+        });
+    }
+
+    function createLine(x1, y1, x2, y2) {
+        const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+        const line = document.createElement('div');
+        line.className = 'att-line';
+        line.style.width = `${length}px`;
+        line.style.left = `${x1}px`;
+        line.style.top = `${y1}px`;
+        line.style.transform = `rotate(${angle}deg)`;
+
+        attLinesLayer.appendChild(line);
+    }
+
+    function clearAttentionState() {
+        activeSourceCell = null;
+        // 清除所有目标高亮
+        Array.from(attGrid.children).forEach(cell => cell.classList.remove('att-target'));
+        // 清除所有连线
+        attLinesLayer.innerHTML = '';
+    }
+
+
+    // =========================================
+    // 全局阶段切换逻辑
+    // =========================================
+    let currentStage = 0;
+    const stages = document.querySelectorAll('.stage-card');
+    const dots = document.querySelectorAll('.step-dot');
+
+    function showStage(index) {
+        currentStage = index;
+
+        // 更新卡片
+        stages.forEach((stage, i) => {
+            stage.classList.remove('active');
+            if(i === index) stage.classList.add('active');
+        });
+
+        // 更新进度条
+        dots.forEach((dot, i) => {
+            dot.classList.remove('active');
+            if(i <= index) dot.classList.add('active');
+        });
+    }
+
+    function nextStage() {
+        if (currentStage < stages.length - 1) {
+            showStage(currentStage + 1);
+        }
+    }
+</script>
+
+</body>
+</html>
