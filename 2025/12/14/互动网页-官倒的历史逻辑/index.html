@@ -1,0 +1,433 @@
+<p>&lt;!DOCTYPE html&gt;</p>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1988：异化的齿轮 (加速版)</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #ccc;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            display: flex;
+            height: 95vh;
+            overflow: hidden;
+        }
+
+        /* 布局 */
+        .col-left { flex: 1.4; padding-right: 15px; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .col-mid { flex: 0.6; padding: 0 15px; border-right: 1px solid #333; display: flex; flex-direction: column; justify-content: center; }
+        .col-right { flex: 1; padding-left: 15px; }
+
+        h3 { border-bottom: 1px dashed #666; padding-bottom: 5px; margin-top: 0; color: #fff;}
+
+        /* 个人获利面板 */
+        .personal-panel {
+            background: #111; border: 1px solid #444; padding: 10px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .p-item { text-align: center; }
+        .p-label { font-size: 0.8em; color: #888; display: block; }
+        .p-val { font-size: 1.2em; font-weight: bold; color: #d4af37; } 
+        .p-rank { color: #f55; font-weight: bold; }
+
+        /* 按钮 */
+        .btn-section { margin-bottom: 10px; border: 1px solid #222; padding: 8px; background: #080808; }
+        .btn-label { font-size: 0.8em; color: #555; margin-bottom: 5px; display: block; border-bottom: 1px solid #222; }
+
+        button {
+            width: 100%; padding: 10px; margin-bottom: 5px;
+            background: #111; border: 1px solid #444; color: #ddd;
+            cursor: pointer; text-align: left; transition: 0.2s; position: relative;
+        }
+        button:hover { background: #222; border-color: #888; }
+        button:active { transform: scale(0.98); }
+        button strong { color: #fff; font-size: 1em; display: block;}
+        button small { color: #888; font-size: 0.75em; }
+        .btn-cheat:hover { border-color: #d33; background: #210; }
+
+        /* 按钮激活时的特效 */
+        .btn-active {
+            border-color: #d33 !important;
+            background: repeating-linear-gradient(45deg, #210, #210 10px, #310 10px, #310 20px);
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* 竞争条 */
+        .bar-container { height: 350px; width: 60px; margin: 0 auto; background: #222; position: relative; border: 1px solid #555; }
+        .bar-wang { 
+            position: absolute; bottom: 0; right: 0; width: 50%; background: #d33; 
+            transition: height 0.5s; box-shadow: 0 0 15px rgba(221, 51, 51, 0.6); 
+        }
+        .bar-me { 
+            position: absolute; bottom: 0; left: 0; width: 50%; background: #3d3; 
+            transition: height 0.2s; 
+        }
+        .vs-label { text-align: center; font-size: 0.8em; margin-top: 5px; color: #666; }
+
+        /* 宏观数据 */
+        .macro-val { font-size: 2.5em; font-weight: bold; color: #fff; }
+        .danger { color: #f33 !important; text-shadow: 0 0 10px #f00; animation: pulse 0.8s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* 结局弹窗通用 */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; justify-content: center; align-items: center; flex-direction: column; overflow-y: auto; }
+        #modal-content { width: 90%; max-width: 900px; text-align: center; color: #fff; padding: 20px; }
+
+        /* 结局标题样式 */
+        .end-title-box { border: 2px solid #fff; padding: 10px 30px; margin-bottom: 30px; display: inline-block; }
+        .end-title { font-size: 2em; font-weight: bold; letter-spacing: 2px; margin: 0; }
+
+        /* 结局A：先富起来 */
+        .ending-marx .end-title-box { border-color: #d4af37; color: #d4af37; background: #210; }
+        .ending-marx .quote { font-style: italic; font-size: 1.4em; color: #ff3333; line-height: 1.6; margin-bottom: 30px; text-shadow: 2px 2px 0 #000; }
+        .ending-marx .hist-text { text-align: left; line-height: 1.8; color: #ccc; font-size: 0.95em; margin-bottom: 20px; border-left: 3px solid #d33; padding-left: 20px; background: rgba(255,0,0,0.05); }
+        .ending-marx .cynical { font-size: 1.3em; color: #d4af37; font-weight: bold; margin-top: 40px; border-top: 1px dashed #640; padding-top: 20px; }
+
+        /* 结局B：十年寒窗 */
+        .ending-real .end-title-box { border-color: #aaa; color: #fff; background: #111; }
+        .timeline-box { display: flex; flex-wrap: wrap; justify-content: space-between; text-align: left; margin-top: 20px; font-size: 0.9em; gap: 20px;}
+        .timeline-col { flex: 1; min-width: 300px; padding: 20px; border: 1px solid #333; background: #050505; }
+        .wang-col { border-color: #664400; background: linear-gradient(180deg, #1a1000 0%, #000 100%); }
+        .me-col { border-color: #333; background: #111; opacity: 0.8;}
+        .year { font-weight: bold; font-size: 1.2em; display: inline-block; width: 60px; color: #888;}
+        .event { margin-bottom: 15px; line-height: 1.4; border-bottom: 1px dashed #333; padding-bottom: 10px;}
+        .wang-col .year { color: #ffaa00; }
+        .wang-col .event { color: #ffcc66; }
+        .punchline { margin-top: 30px; font-size: 1.5em; color: #fff; font-weight: bold; text-align: center; border: 1px solid #fff; padding: 20px; width: 100%; box-sizing: border-box;}
+    </style>
+</head>
+<body>
+
+    <div class="col-left">
+        <h3>我的状态 (国企厂长)</h3>
+
+        <div class="personal-panel">
+            <div class="p-item">
+                <span class="p-label">个人资产 (固定工资)</span>
+                <span id="p-wealth" class="p-val">200</span>
+                <span style="font-size:0.8em; color:#666">元</span>
+                <div id="p-luxury" style="font-size:0.7em; color:#d4af37; margin-top:5px; height:20px;"></div>
+            </div>
+            <div class="p-item">
+                <span class="p-label">行政级别</span>
+                <span id="p-rank" class="p-rank">副科级</span>
+            </div>
+        </div>
+
+        <div class="btn-section">
+            <span class="btn-label">常规经营 (良心路线)</span>
+            <button onclick="act('work_hard')">
+                <strong>狠抓生产质量</strong>
+                <small>利润微薄，但问心无愧。</small>
+            </button>
+            <button onclick="act('meeting')">
+                <strong>组织政治学习</strong>
+                <small>强调奉献，稳定人心。</small>
+            </button>
+        </div>
+
+        <div class="btn-section" style="border-color: #522;">
+            <span class="btn-label" style="color:#d55">体制捷径 (资本异化路线)</span>
+            <button id="btn-invest" class="btn-cheat" onclick="act('invest')">
+                <strong>大上基建项目</strong>
+                <small>>> <span id="hint-invest">启动政绩飞轮 (一旦开始无法停止)</span></small>
+            </button>
+            <button id="btn-guandao" class="btn-cheat" onclick="act('guandao')">
+                <strong>倒卖计划外钢材</strong>
+                <small>>> <span id="hint-guandao">启动资本积累 (一旦开始无法停止)</span></small>
+            </button>
+        </div>
+    </div>
+
+    <div class="col-mid">
+        <h3>命运对比</h3>
+        <div class="bar-container">
+            <div id="bar-me" class="bar-me" style="height: 50%;"></div>
+            <div id="bar-wang" class="bar-wang" style="height: 50%;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; width:80%; margin:0 auto;">
+            <div class="vs-label" style="color:#3d3">我</div>
+            <div class="vs-label" style="color:#d33">老王</div>
+        </div>
+        <div id="status-msg" style="text-align:center; margin-top:20px; font-size:0.9em; font-weight:bold; color:#f90; min-height: 40px;">
+            起跑线相同
+        </div>
+    </div>
+
+    <div class="col-right">
+        <h3>国家宏观经济</h3>
+        <div style="margin-top:20px;">
+            <div>CPI (通货膨胀率)</div>
+            <div id="val-cpi" class="macro-val">2.0%</div>
+        </div>
+        <div id="news-box" style="margin-top:20px; border-top:1px dotted #555; padding-top:10px; font-size:0.85em; color:#888; height: 350px; overflow: hidden; display:flex; flex-direction:column-reverse;">
+            <div style="color:#666; padding-bottom:5px;">> 1987年春：改革进入深水区...</div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div id="modal-content"></div>
+        <button onclick="location.reload()" style="margin-top: 20px; padding:10px 30px; border:1px solid #fff; background:#000; color:#fff; cursor:pointer;">重启历史</button>
+    </div>
+
+    <script>
+        let myStatus = 50;   
+        let wangStatus = 50; 
+        let cpi = 2.0;
+        let isGameOver = false;
+        let wangRate = 0.6;
+        let wealth = 200; 
+        let rankLevel = 0; 
+        const ranks = ["副科级", "正科级", "副处级", "正处级", "局级干部"];
+        let luxuryList = [];
+
+        // 自动机状态管理
+        let autoState = {
+            invest: { running: false, speed: 1000, timer: null },
+            guandao: { running: false, speed: 1000, timer: null }
+        };
+
+        // 老王的生活暴击 (恢复回来了！)
+        let wangMilestones = {
+            70: "【生活暴击】老王买了日本原装彩电，请全厂干部去他家看《霍元甲》。你家还在听收音机。",
+            90: "【生活暴击】老王换了一辆本田摩托车，轰着油门从你骑自行车的身边掠过。",
+            110: "【生活暴击】听说老王给老婆买了条金项链，你老婆问你什么时候能涨工资。",
+            130: "【生活暴击】老王买了“大哥大”手提电话，在饭局上声音很大地谈几百万的生意。",
+            150: "【生活暴击】老王全家去美国旅游考察了，回来给你带了一包洋烟。",
+            180: "【生活暴击】老王在市里买了独栋小楼（别墅），搬出了筒子楼，和你彻底不是邻居了。",
+            200: "【生活暴击】老王把孩子送去贵族学校寄宿了，说国内教育太苦。"
+        };
+        let triggeredMilestones = [];
+
+        setInterval(() => {
+            if(isGameOver) return;
+            // 老王指数级增长
+            wangStatus += (Math.random() * 2 + wangRate); 
+            wangRate += 0.08; 
+            cpi += 0.47; 
+
+            checkMilestones(); // 检查嘲讽触发
+            checkStatus();
+            if(!isGameOver) updateUI();
+        }, 800);
+
+        function checkMilestones() {
+            for (let [threshold, msg] of Object.entries(wangMilestones)) {
+                let t = parseInt(threshold);
+                if (wangStatus >= t && !triggeredMilestones.includes(threshold)) {
+                    log(msg, "#ffcc00"); // 金色高亮
+                    triggeredMilestones.push(threshold);
+                }
+            }
+        }
+
+        // 核心逻辑修改：将效果与点击分离
+        function act(type) {
+            if(isGameOver) return;
+
+            // 1. 常规良心路线（手动，无加速）
+            if(type === 'work_hard' || type === 'meeting') {
+                myStatus += 0.5; 
+                log("你拿着死工资狠抓工作。老王看你的眼神像看外星人。", "#686");
+            } 
+            // 2. 投机路线（自动，可加速）
+            else if(type === 'invest' || type === 'guandao') {
+                executeSpeculation(type); // 立即执行一次效果
+
+                let state = autoState[type];
+
+                if (!state.running) {
+                    // 第一次启动
+                    state.running = true;
+                    document.getElementById('btn-' + type).classList.add('btn-active');
+                    document.getElementById('hint-' + type).innerText = "资本正在自我增殖中...";
+                    log("【系统】潘多拉魔盒已打开，它将自我运行，直至毁灭。", "#f33");
+
+                    // 启动递归循环
+                    runAutoLoop(type);
+                } else {
+                    // 已经在运行，再次点击 = 加速
+                    state.speed = Math.max(50, state.speed * 0.7); // 每次点击缩短30%间隔，最快50ms
+                    log(">>> 贪婪在加速！当前频率: " + (1000/state.speed).toFixed(1) + "次/秒", "#f55");
+                }
+            }
+
+            checkStatus();
+            updateUI();
+        }
+
+        // 递归执行循环
+        function runAutoLoop(type) {
+            if(isGameOver) return;
+
+            let state = autoState[type];
+
+            // 安排下一次执行，时间间隔基于当前的 state.speed
+            state.timer = setTimeout(() => {
+                executeSpeculation(type);
+                checkStatus();
+                updateUI();
+                runAutoLoop(type); // 递归调用
+            }, state.speed);
+        }
+
+        // 提取出来的投机逻辑
+        function executeSpeculation(type) {
+            if(isGameOver) return;
+
+            if(type === 'invest') { 
+                myStatus += 4; cpi += 0.8; 
+                if(Math.random() > 0.3 && rankLevel < 4) {
+                    rankLevel++;
+                    log("【政绩】大楼盖起来了，你被提拔为 " + ranks[rankLevel], "#d4af37");
+                } else {
+                    // 只有在速度较慢时才打印普通消息，防止刷屏
+                    if(autoState['invest'].speed > 200) {
+                        log("基建狂潮：水泥搅拌的声音掩盖了理性的声音。", "#f99"); 
+                    }
+                }
+            } 
+            else if (type === 'guandao') { 
+                myStatus += 4; cpi += 0.4; 
+                let earn = Math.floor(Math.random() * 5000 + 3000);
+                wealth += earn;
+
+                checkLuxury(); // 检查奢侈品
+
+                if(autoState['guandao'].speed > 200) {
+                    log("【暴富】批条一转手，进账 " + earn + " 元！", "#d4af37"); 
+                }
+            }
+        }
+
+        function checkLuxury() {
+            if(wealth > 5000 && !luxuryList.includes("彩电")) luxuryList.push("彩电");
+            if(wealth > 20000 && !luxuryList.includes("摩托车")) luxuryList.push("摩托车");
+            if(wealth > 100000 && !luxuryList.includes("桑塔纳")) luxuryList.push("桑塔纳");
+            if(wealth > 500000 && !luxuryList.includes("独栋别墅")) luxuryList.push("独栋别墅");
+            let luxItem = luxuryList.length > 0 ? "拥有：" + luxuryList[luxuryList.length-1] : "";
+            document.getElementById('p-luxury').innerText = luxItem;
+        }
+
+        function checkStatus() {
+            if (wangStatus > myStatus + 95) { 
+                showEnding('realism'); 
+            }
+            else if (cpi > 25.0) { // 稍微调高一点容错，因为自动加速很快
+                showEnding('marx'); 
+            }
+        }
+
+        function updateUI() {
+            let max = Math.max(myStatus, wangStatus, 100);
+            document.getElementById('bar-me').style.height = (myStatus / max * 100) + "%";
+            document.getElementById('bar-wang').style.height = (wangStatus / max * 100) + "%";
+            document.getElementById('p-wealth').innerText = wealth.toLocaleString();
+            document.getElementById('p-rank').innerText = ranks[rankLevel];
+            document.getElementById('val-cpi').innerText = cpi.toFixed(1) + "%";
+            if(cpi > 10) document.getElementById('val-cpi').className = "macro-val danger";
+
+            let diff = wangStatus - myStatus;
+            let msg = "起跑线相同";
+            let color = "#aaa";
+            if(diff > 30) { msg = "老王骑摩托带风，你还在骑自行车"; color = "#ddaa00"; }
+            if(diff > 60) { msg = "老王拿大哥大，你还在排队打公用电话"; color = "#ff4400"; }
+            if(diff > 90) { msg = "警告：你即将被时代淘汰！"; color = "#ff0000"; }
+            document.getElementById('status-msg').innerText = msg;
+            document.getElementById('status-msg').style.color = color;
+        }
+
+        function log(text, color) {
+            let div = document.createElement('div');
+            div.innerText = "> " + text;
+            div.style.marginBottom = "8px";
+            div.style.color = color || "#888";
+            if(color === "#d4af37" || color === "#ffcc00") { // 暴富或嘲讽加粗
+                div.style.fontWeight = "bold"; 
+                if(color === "#ffcc00") {
+                   div.style.borderBottom = "1px solid #440";
+                   div.style.paddingBottom = "5px";
+                }
+            }
+            let box = document.getElementById('news-box');
+            box.prepend(div); 
+            // 保持日志数量，防止卡顿
+            if(box.children.length > 20) {
+                box.removeChild(box.lastChild);
+            }
+        }
+
+        function showEnding(type) {
+            if(isGameOver) return; // 防止重复触发
+            isGameOver = true;
+
+            // 停止所有自动机
+            if(autoState.invest.timer) clearTimeout(autoState.invest.timer);
+            if(autoState.guandao.timer) clearTimeout(autoState.guandao.timer);
+
+            let content = document.getElementById('modal-content');
+            let modal = document.getElementById('modal');
+
+            if (type === 'marx') {
+                // 结局A：先富起来
+                content.className = 'ending-marx';
+                content.innerHTML = `
+                    <div class="end-title-box"><h1 class="end-title">达成结局：先富起来</h1></div>
+
+                    <p class="quote">“资本来到世间，从头到脚，每个毛孔都滴着血和肮脏的东西。”<br><span style="font-size:0.6em">—— 马克思《资本论》</span></p>
+
+                    <div class="hist-text">
+                        <p>理性的个人叠加在一起，构成了时代的疯狂。</p>
+                        <p>当你按下那个按钮时，你以为你在控制资本，实际上是资本在控制你。加速的齿轮最终碾碎了社会的承受底线。</p>
+                        <p>1988年价格闯关在宏观经济过热且准备不足的情况下贸然启动，直接引爆了恶性通货膨胀与全国性抢购恐慌。</p>
+                    </div>
+
+                    <div class="cynical">
+                        “不过这和你，和老王，又有什么关系呢？<br>毕竟，你们已经先富起来了。”
+                    </div>
+                `;
+            } else {
+                // 结局B：十年寒窗
+                content.className = 'ending-realism';
+                content.innerHTML = `
+                    <div class="end-title-box"><h1 class="end-title">达成结局：十年寒窗</h1></div>
+
+                    <div class="timeline-box">
+                        <div class="timeline-col me-col">
+                            <h2 style="color:#aaa; border-bottom:1px solid #555">你的家族命运</h2>
+                            <div class="event"><span class="year">1998</span><br>国企改革，你作为冗员下岗，摆摊维生。</div>
+                            <div class="event"><span class="year">2003</span><br>在非典疫情中不幸感染，没能挺过那个春天。</div>
+                            <div class="event"><span class="year">2025</span><br><strong>你的孙子</strong><br>刚刚经历了“千军万马过独木桥”的高考<br>如果他是万分之六的幸运，或许现在有幸正在看这行字</div>
+                        </div>
+                        <div class="timeline-col wang-col">
+                            <h2 style="color:#fc0; border-bottom:1px solid #960">老王家族命运</h2>
+                            <div class="event"><span class="year">1998</span><br>老王进军房地产，拿下省城核心地块。</div>
+                            <div class="event"><span class="year">2003</span><br>身价过亿，成为著名民营企业家。</div>
+                            <div class="event"><span class="year">2025</span><br><strong>小王 (老王孙子)</strong><br>叛逆疯玩18年后，进入<strong>前往美东NYU攻读MBA</strong>。<br>未来计划：回国继承家产。</div>
+                        </div>
+                    </div>
+
+                    <div class="punchline">
+                        “你十年寒窗，怎么比得过人家小王家里几代人的努力？”
+                    </div>
+                `;
+            }
+            setTimeout(() => { modal.style.display = 'flex'; }, 500);
+        }
+    </script>
+</body>
+</html>
