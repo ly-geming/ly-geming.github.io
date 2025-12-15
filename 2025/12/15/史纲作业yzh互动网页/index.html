@@ -1,0 +1,439 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1988：如履薄冰</title>
+    <style>
+        /* 复古科技风格 */
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --highlight: #e94560;
+            --text-main: #ecf0f1;
+            --bar-bg: #0f3460;
+        }
+
+        body {
+            font-family: 'Courier New', 'SimHei', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* 顶部仪表盘 */
+        header {
+            width: 100%;
+            padding: 20px 0;
+            background: rgba(0,0,0,0.3);
+            text-align: center;
+            border-bottom: 2px solid var(--highlight);
+        }
+
+        h1 { margin: 0; font-size: 2rem; letter-spacing: 5px; }
+        .sub-h { font-size: 0.9rem; color: #888; }
+
+        /* 指标展示区 */
+        #dashboard {
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px 0;
+        }
+
+        .meter-box {
+            text-align: center;
+            width: 30%;
+        }
+
+        .meter-label { font-size: 1.2rem; margin-bottom: 10px; display: block; }
+
+        .progress-bar {
+            height: 20px;
+            background-color: var(--bar-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .fill {
+            height: 100%;
+            transition: width 0.8s ease-in-out, background-color 0.5s;
+            width: 50%;
+        }
+
+        /* 不同的颜色 */
+        #reform-fill { background-color: #3498db; }
+        #inflation-fill { background-color: #f1c40f; }
+        #corruption-fill { background-color: #9b59b6; }
+
+        /* 卡牌交互区 */
+        #game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .round-indicator {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--highlight);
+            font-weight: bold;
+        }
+
+        .scenario-text {
+            font-size: 1.3rem;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 2px solid #444;
+            border-radius: 10px;
+            width: 220px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--highlight);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+        }
+
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;}
+        .card-desc { font-size: 0.9rem; color: #ccc; margin-bottom: 15px; min-height: 40px;}
+        .card-effect { font-size: 0.8rem; color: #888; font-style: italic; }
+
+        /* 警告闪烁 */
+        .danger-alert {
+            animation: blinkRed 1s infinite;
+        }
+
+        @keyframes blinkRed {
+            0% { box-shadow: 0 0 0 red; }
+            50% { box-shadow: 0 0 20px red; }
+            100% { box-shadow: 0 0 0 red; }
+        }
+
+        /* 结局覆盖层 */
+        #ending-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #ending-title { font-size: 3rem; color: var(--highlight); margin-bottom: 20px; }
+        #ending-desc { font-size: 1.5rem; max-width: 700px; text-align: center; margin-bottom: 40px; line-height: 1.5; color: #ddd;}
+
+        .btn-restart {
+            padding: 15px 40px;
+            background: var(--highlight);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* 动态新闻条 */
+        #news-ticker {
+            width: 100%;
+            background: #000;
+            color: #0f0;
+            padding: 10px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 1rem;
+            border-top: 1px solid #333;
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 15s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏛️ 1988 宏观调控模拟器</h1>
+        <div class="sub-h">请通过策略卡牌，平衡各项经济指标</div>
+    </header>
+
+    <div id="dashboard">
+        <div class="meter-box">
+            <span class="meter-label">🚀 改革深入度</span>
+            <div class="progress-bar"><div id="reform-fill" class="fill" style="width: 20%"></div></div>
+        </div>
+        <div class="meter-box">
+            <span class="meter-label">🔥 通货膨胀 (CPI)</span>
+            <div class="progress-bar"><div id="inflation-fill" class="fill" style="width: 15%"></div></div>
+        </div>
+        <div class="meter-box">
+            <span class="meter-label">🐛 双轨制腐败</span>
+            <div class="progress-bar"><div id="corruption-fill" class="fill" style="width: 60%"></div></div>
+        </div>
+    </div>
+
+    <div id="game-area">
+        <div class="round-indicator" id="round-display">第 1 回合：1988年 春</div>
+        <div class="scenario-text" id="scenario-text">
+            经济过热迹象初显，"倒爷"倒卖紧俏物资，群众对双轨制下的腐败怨声载道。作为决策层，你现在的首要任务是什么？
+        </div>
+
+        <div class="cards-container" id="cards-area">
+            <!-- 卡牌由JS生成 -->
+        </div>
+    </div>
+
+    <div id="ending-overlay">
+        <div id="ending-title">闯关失败</div>
+        <div id="ending-desc"></div>
+        <button class="btn-restart" onclick="location.reload()">重新审视历史</button>
+    </div>
+
+    <div id="news-ticker">
+        <div class="ticker-content" id="ticker-text">1988年新闻快讯：各地市场物资供应紧张... 广大群众期盼解决物价双轨问题... 中央正在酝酿重大改革措施...</div>
+    </div>
+
+    <script>
+        // 游戏初始数据
+        let state = {
+            reform: 20,    // 目标：越高越好
+            inflation: 15, // 目标：越低越好，超过80崩溃
+            corruption: 60, // 目标：越低越好，超过90崩溃
+            round: 1
+        };
+
+        const roundsData = [
+            {
+                round: 1,
+                name: "1988年 春：风起云涌",
+                desc: "面对日益严重的‘官倒’和腐败，社会舆论压力巨大。你需要决定上半年的经济基调。",
+                cards: [
+                    {
+                        title: "严厉整顿秩序",
+                        desc: "派工作组严查倒爷，暂停部分放权。",
+                        effect: "腐败↓↓ 改革↓ 经济活力↓",
+                        update: { reform: -5, inflation: -5, corruption: -20 }
+                    },
+                    {
+                        title: "扩大信贷投放",
+                        desc: "增加货币供应，刺激生产以解决短缺。",
+                        effect: "通胀↑↑ 改革↑ 腐败↑",
+                        update: { reform: 5, inflation: 15, corruption: 5 }
+                    },
+                    {
+                        title: "酝酿价格改革",
+                        desc: "与其长痛不如短痛，准备放开价格。",
+                        effect: "改革↑↑ 通胀↑ 预期不稳",
+                        update: { reform: 20, inflation: 10, corruption: -5 }
+                    }
+                ]
+            },
+            {
+                round: 2,
+                name: "1988年 夏：关键抉择",
+                desc: "中央正在北戴河开会。‘双轨制’如同毒瘤，但不改又是死路一条。必须做出战略决断！",
+                cards: [
+                    {
+                        title: "维持现状 (保守)",
+                        desc: "继续实行双轨制，求稳为主。",
+                        effect: "腐败↑↑↑ 改革停滞",
+                        update: { reform: -10, inflation: 0, corruption: 30 }
+                    },
+                    {
+                        title: "价格闯关 (激进)",
+                        desc: "全面放开物价，实行工资价格改革。",
+                        effect: "改革↑↑↑ 通胀↑↑↑",
+                        update: { reform: 40, inflation: 40, corruption: -10 }
+                    },
+                    {
+                        title: "小步快跑",
+                        desc: "只放开部分小商品价格。",
+                        effect: "改革↑ 通胀↑ 腐败不变",
+                        update: { reform: 10, inflation: 10, corruption: 0 }
+                    }
+                ]
+            },
+            {
+                round: 3,
+                name: "1988年 秋：风暴降临",
+                desc: "无论你之前做了什么选择，市场预期已经失控。抢购风潮开始在全国蔓延！",
+                cards: [
+                    {
+                        title: "紧急抛售物资",
+                        desc: "动用国库储备平抑物价。",
+                        effect: "通胀↓ 储备枯竭",
+                        update: { reform: 0, inflation: -10, corruption: 0 }
+                    },
+                    {
+                        title: "提高存款利率",
+                        desc: "实行‘保值储蓄’，回笼货币。",
+                        effect: "通胀↓ 经济降温",
+                        update: { reform: 0, inflation: -15, corruption: 0 }
+                    },
+                    {
+                        title: "坚持原定方案",
+                        desc: "开弓没有回头箭，继续闯关！",
+                        effect: "通胀↑↑↑↑ 改革↑",
+                        update: { reform: 10, inflation: 50, corruption: -10 }
+                    }
+                ]
+            }
+        ];
+
+        function initGame() {
+            renderDashboard();
+            loadRound(0);
+        }
+
+        function loadRound(index) {
+            if (index >= 3) {
+                endGame();
+                return;
+            }
+
+            state.round = index + 1;
+            const data = roundsData[index];
+
+            document.getElementById('round-display').innerText = `第 ${state.round} 回合：${data.name.split('：')[1]}`;
+            document.getElementById('scenario-text').innerText = data.desc;
+
+            const cardsArea = document.getElementById('cards-area');
+            cardsArea.innerHTML = "";
+
+            data.cards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.innerHTML = `
+                    <div class="card-title">${card.title}</div>
+                    <div class="card-desc">${card.desc}</div>
+                    <div class="card-effect">${card.effect}</div>
+                `;
+                cardEl.onclick = () => makeChoice(card.update, index);
+                cardsArea.appendChild(cardEl);
+            });
+        }
+
+        function makeChoice(changes, roundIndex) {
+            // 更新数值
+            state.reform += changes.reform;
+            state.inflation += changes.inflation;
+            state.corruption += changes.corruption;
+
+            // 历史事件强制修正（模拟历史的不可控性）
+            if (roundIndex === 1 && changes.inflation > 10) {
+                // 如果在第二回合选了闯关，通胀会额外暴涨（抢购风）
+                state.inflation += 20; 
+                showNews("⚠️ 突发：全国多地出现抢购风潮！电视机被抢空！");
+            }
+
+            // 限制数值范围 0-100
+            state.reform = Math.min(100, Math.max(0, state.reform));
+            state.inflation = Math.min(100, Math.max(0, state.inflation));
+            state.corruption = Math.min(100, Math.max(0, state.corruption));
+
+            renderDashboard();
+            checkDanger();
+
+            // 延迟进入下一回合
+            setTimeout(() => {
+                loadRound(roundIndex + 1);
+            }, 500);
+        }
+
+        function renderDashboard() {
+            setBar('reform-fill', state.reform);
+            setBar('inflation-fill', state.inflation);
+            setBar('corruption-fill', state.corruption);
+        }
+
+        function setBar(id, value) {
+            const el = document.getElementById(id);
+            el.style.width = value + "%";
+            // 颜色变化逻辑
+            if (value > 80 && id !== 'reform-fill') {
+                el.style.backgroundColor = "#ff0000"; // 危险红
+            } else if (id === 'inflation-fill') {
+                el.style.backgroundColor = "#f1c40f";
+            }
+        }
+
+        function checkDanger() {
+            if (state.inflation > 70) {
+                showNews("⚠️ 警告：CPI 指数严重超标，民众恐慌情绪蔓延！");
+                document.body.style.boxShadow = "inset 0 0 50px red";
+            } else if (state.corruption > 80) {
+                showNews("⚠️ 警告：腐败严重，社会公平受到极大挑战！");
+            }
+        }
+
+        function showNews(text) {
+            const ticker = document.getElementById('ticker-text');
+            ticker.innerText = text;
+            // 重置动画
+            ticker.style.animation = 'none';
+            ticker.offsetHeight; /* trigger reflow */
+            ticker.style.animation = 'ticker 10s linear infinite';
+        }
+
+        function endGame() {
+            const overlay = document.getElementById('ending-overlay');
+            const title = document.getElementById('ending-title');
+            const desc = document.getElementById('ending-desc');
+
+            overlay.style.display = 'flex';
+
+            // 根据数值生成结局
+            if (state.inflation > 60) {
+                title.innerText = "结局：物价闯关受挫";
+                desc.innerHTML = `最终 CPI 定格在高位。<br>为了推进改革，你选择了激进方案，但引发了严重的通货膨胀和抢购风潮。<br>这正是1988年真实发生的困境。<br><br><strong>改革陷入了迷茫，下一步该何去何从？</strong>`;
+            } else if (state.corruption > 70) {
+                title.innerText = "结局：改革陷入停滞";
+                desc.innerHTML = `虽然控制住了物价，但双轨制带来的腐败（官倒）已经病入膏肓。<br>不做手术，机体就会坏死。<br><br><strong>温和疗法已失效，需要更彻底的破局。</strong>`;
+            } else {
+                title.innerText = "结局：历史的平行线";
+                desc.innerHTML = `你试图维持一种微妙的平衡，但在那个激荡的年代，平衡往往意味着无所作为。<br>改革不进则退。<br><br><strong>让我们看看历史是如何选择的...</strong>`;
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
