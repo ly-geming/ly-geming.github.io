@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <!-- TODO: add your Chinese name if you want, e.g. Yinxi Wang | 王银玺 -->
-  <title>Yinxi Wang</title>
+  <title>Yinxi Wang | 王印熹</title>
   <meta name="author" content="Yinxi Wang">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -43,9 +42,8 @@
               </p>
             </td>
             <td style="padding:2.5%;width:37%;max-width:37%">
-              <!-- TODO: put your photo at images/profile.jpg (square works best) -->
-              <img style="width:100%;max-width:100%;object-fit:cover;border-radius:50%;"
-                   alt="profile photo" src="images/profile.jpg"
+              <img style="width:100%;max-width:200px;aspect-ratio:1;object-fit:cover;object-position:center top;border-radius:50%;display:block;margin:0 auto;"
+                   alt="profile photo" src="IMG.jpg"
                    onerror="this.style.display='none'">
             </td>
           </tr>
@@ -57,10 +55,9 @@
             <td style="padding:16px;width:100%;vertical-align:middle">
               <h2>News</h2>
               <ul style="line-height:1.5;">
-                <!-- TODO: replace with your real news, newest first -->
-                <li><strong>[2026.06]</strong> New preprint <a href="#">LaST-HD</a> is released on arXiv.</li>
-                <li><strong>[2026.04]</strong> New preprint <a href="#">LaST-R1</a> is released on arXiv.</li>
-                <li><strong>[2025.XX]</strong> Joined the HMI Lab as a research intern.</li>
+                <li><strong>[2026.06]</strong> New preprint <a href="https://arxiv.org/abs/2606.23685">LaST-HD</a> is released on arXiv.</li>
+                <li><strong>[2026.04]</strong> New preprint <a href="https://arxiv.org/abs/2604.28192">LaST-R1</a> is released on arXiv.</li>
+                <li><strong>[2026.01]</strong> Joined the HMI Lab as a research intern.</li>
               </ul>
             </td>
           </tr>
@@ -75,8 +72,8 @@
               <h2>Selected Publications</h2>
               <p>
                 My research focuses on Embodied AI &mdash; world models, vision-language-action
-                models, and deep reinforcement learning for robot manipulation. Some papers are
-                <span class="highlight">highlighted</span>. (<sup>*</sup> denotes equal contribution.)
+                models, and deep reinforcement learning for robot manipulation.
+                (<sup>*</sup> denotes equal contribution.)
               </p>
             </td>
           </tr>
@@ -84,45 +81,47 @@
 
         <table style="width:100%;border:0;border-spacing:0 10px;border-collapse:separate;margin:0 auto;"><tbody>
 
-          <!-- Publication 1 -->
+          <!-- Publication 1: LaST-HD (newest) -->
           <tr>
             <td style="padding:16px;width:25%;vertical-align:middle">
-              <!-- TODO: add images/last-r1.png teaser -->
-              <img src="images/last-r1.png" width="100%" alt="LaST-R1 teaser"
+              <img src="images/last-hd.png" width="100%" alt="LaST-HD method figure"
                    onerror="this.style.display='none'">
             </td>
             <td style="padding:16px;width:75%;vertical-align:middle">
-              <a href="#"><span class="papertitle">LaST-R1: Reinforcing Action via Adaptive Physical Latent Reasoning for VLA Models</span></a>
+              <a href="https://arxiv.org/abs/2606.23685"><span class="papertitle">LaST-HD: Learning Latent Physical Reasoning from Scalable Human Data for Robot Manipulation</span></a>
               <br>
-              <!-- TODO: confirm author order -->
-              H. Chen, J. Liu, Z. Yan, N. Han, R. Zhang, C. Gu, J. Gao, Z. Guo, S. Qian,
-              <strong>Yinxi Wang</strong>, et al.
+              Jiaming Liu<sup>*</sup>, <strong>Yinxi Wang</strong>, Chenyang Gu<sup>*</sup>, Siyuan Qian<sup>*</sup>, Xiangju Mi<sup>*</sup>, Hao Chen, Jiawei Chen, Qingpo Wuwu, Xiaoqi Li, Nuowei Han, Yiming Zhang, Xuheng Zhang, Yang Yue, Yeqing Yang, Lei Wang, Peng Jia, Hao Tang, Shanghang Zhang
               <br>
               <em>arXiv preprint</em>, 2026
               <br>
-              <a href="#">arXiv</a> /
+              <a href="https://arxiv.org/abs/2606.23685">arXiv</a> /
               <a href="#">Project</a> /
               <a href="#">Code</a>
+              <p style="margin:6px 0 0;">
+                Aligns human-hand and robot demonstrations in a shared latent space through an action-conditioned world model, enabling low-cost, data-efficient transfer of physical reasoning to robot manipulation.
+              </p>
             </td>
           </tr>
 
-          <!-- Publication 2 -->
+          <!-- Publication 2: LaST-R1 (earlier) -->
           <tr>
             <td style="padding:16px;width:25%;vertical-align:middle">
-              <img src="images/last-hd.png" width="100%" alt="LaST-HD teaser"
+              <img src="images/last-r1.png" width="100%" alt="LaST-R1 method figure"
                    onerror="this.style.display='none'">
             </td>
             <td style="padding:16px;width:75%;vertical-align:middle">
-              <a href="#"><span class="papertitle">LaST-HD: Learning Latent Physical Reasoning from Scalable Human Data for Robot Manipulation</span></a>
+              <a href="https://arxiv.org/abs/2604.28192"><span class="papertitle">LaST-R1: Reinforcing Robotic Manipulation via Adaptive Physical Latent Reasoning</span></a>
               <br>
-              J. Liu, <strong>Yinxi Wang</strong>, C. Gu, S. Qian, X. Mi, H. Chen, J. Chen,
-              Q. Wuwu, X. Li, N. Han, et al.
+              Hao Chen, Jiaming Liu<sup>*</sup>, Zhonghao Yan<sup>*</sup>, Nuowei Han<sup>*</sup>, Renrui Zhang, Chenyang Gu, Jialin Gao, Ziyu Guo, Siyuan Qian, <strong>Yinxi Wang</strong>, Peng Jia, Shanghang Zhang, Pheng-Ann Heng
               <br>
               <em>arXiv preprint</em>, 2026
               <br>
-              <a href="#">arXiv</a> /
+              <a href="https://arxiv.org/abs/2604.28192">arXiv</a> /
               <a href="#">Project</a> /
               <a href="#">Code</a>
+              <p style="margin:6px 0 0;">
+                A reinforcement-learning framework that lets a VLA policy perform adaptive latent chain-of-thought reasoning before acting, sharply improving manipulation generalization and execution stability.
+              </p>
             </td>
           </tr>
 
